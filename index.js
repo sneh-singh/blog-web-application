@@ -7,25 +7,86 @@ const masterKey = "4VGP2DN-6EWM4SJ-N6FGRHV-Z3PR3TT";
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//1. GET a random joke
-
-app.get('/jokes/all', (req, res)=> {
+app.get('/randomjokes', (req, res)=> {
   res.json(jokes);
+});
+
+app.get('/jokes/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const foundJoke = jokes.find((joke) => joke.id === id);
+  res.json(foundJoke);
+});
+
+app.get('/jo1kes/filter', (req, res) => {
+  const type = req.query.type;
+  const filteredJokes = jokes.filter((joke) => joke.jokeType === type);
+  res.json(filteredJokes);
+});
+
+app.post('/jokes', (req, res) => {
+  const newJoke = {
+    id: jokes.length + 1,
+    jokeText: req.body.text,
+    jokeType: req.body.type
+  }
+  jokes.push(newJoke);
+  console.log(jokes.slice(-1));
+  res.json(newJoke);
+});
+
+app.put("/jokes/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const replacementjoke = {
+    id: id,
+    jokeText: req.body.text,
+    jokeType: req.body.type
+  };
+
+  const searchIndex = jokes.findIndex((joke) => joke.id === id);
+
+  jokes[searchIndex] = replacementjoke;
+  res.json(replacementjoke);
+});
+
+app.patch("/jokes/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const existingJoke = jokes.find((joke) => joke.id === id);
+  const replacementJoke = {
+    id: id,
+    jokeText: req.body.text || existingJoke.jokeText,
+    jokeType: req.body.type || existingJoke.jokeType,
+  };
+  const searchIndex = jokes.findIndex((joke) => joke.id === id);
+  jokes[searchIndex] = replacementJoke;
+  console.log(jokes[searchIndex]);
+  res.json(replacementJoke);
+});
+
+app.delete("/jokes/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const searchIndex = jokes.findIndex((joke) => joke.id === id);
+  if(searchIndex > -1) {
+    jokes.slice(searchIndex, 1);
+    res.sendStatus(200);
+  } else {
+    res
+    .status(404)
+    .json({error: `joke with id: ${id} not found.
+    No jokes were deleted.`});
+  }
+});
+
+app.delete("/all", (req, res) => {
+  const userKey = req.query.key;
+  if(masterKey === userKey) {
+    jokes = [];
+    res.sendStatus(200);
+  } else { 
+    res
+    .status(404)
+    .json({error: `You are not authorised to perform this action.`});
+  }
 })
-
-//2. GET a specific joke
-
-//3. GET a jokes by filtering on the joke type
-
-//4. POST a new joke
-
-//5. PUT a joke
-
-//6. PATCH a joke
-
-//7. DELETE Specific joke
-
-//8. DELETE All jokes
 
 app.listen(port, () => {
   console.log(`Successfully started server on port ${port}.`);
