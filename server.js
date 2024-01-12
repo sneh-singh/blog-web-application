@@ -15,7 +15,6 @@ app.use(bodyParser.json());
 app.get("/", async(req, res) => {
     try{
         const response = await axios.get(`${API_URL}/jokes`);
-        console.log(response);
         res.render("index.ejs", {jokes: response.data});
     } catch(error) {
         res.status(500).json({message: "Error fetching jokes"});
@@ -28,17 +27,48 @@ app.get("/new", (req, res) => {
 })
 
 app.post("/api/jokes", async(req, res) => {
-    console.log('hello moto', req.body);
     try{
-        console.log('hello moto 1', req.body);
         const response = await axios.post(`${API_URL}/jokes2`, req.body);
-        console.log("hello 1", response);
-        res.status(200).json({message: "successfuly created" + response});
-        // res.redirect("/");
+        res.redirect("/");
     } catch(error) {
-        console.log('hello moto 2', req.body);
         res.status(500).json({message: error.message + " Error creating joke"});
     }
+})
+
+//Go to Update Form Page
+app.get("/edit/:id", async (req, res) => {
+  try {
+    const response = await axios.get(`${API_URL}/jokes/${req.params.id}`);
+    console.log(response.data);
+    res.render("modify.ejs", {
+      heading: "Edit Joke",
+      submit: "Update Joke",
+      jokes: response.data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching joke" });
+  }
+});
+
+//Partially Update the Joke
+app.post("/api/jokes/:id", (req, res) => {
+  try {
+    const response = axios.patch(`${API_URL}/jokes/${req.params.id}`, req.body);
+    console.log(response.data);
+    res.redirect("/");
+  } catch(err) {
+    res.status(500).json({message: "Unable to update Joke!"});
+  }
+})
+
+//Delete the joke
+app.get("/api/jokes/delete/:id", async(req, res) => {
+  try {
+    await axios.delete(`${API_URL}/jokes/${req.params.id}`);
+    res.redirect("/")
+  } catch(err) {
+    res.status(500).json({message: "Error deleting Joke"});
+  }
 })
 
 app.listen(port, ()=> {

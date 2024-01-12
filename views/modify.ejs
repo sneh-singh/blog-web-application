@@ -13,10 +13,10 @@
         </h1>
     
         <% if (locals.jokes) { %>
-          <form id="editForm" method="post" action="/api/jokes/<%=joke.id%>">
-            <input type="text" name="title" value="<%=post.title %>">
-            <textarea id="content" rows="10"><%=post.content %></textarea>
-            <input type="text" name="author" value="<%=post.author %>">
+          <form id="editForm" method="post" action="/api/jokes/<%=jokes.id%>">
+            <input type="text" name="title" value="<%=jokes.jokeType %>">
+            <textarea id="content" rows="10"><%=jokes.jokeText %></textarea>
+            <input type="text" name="author" value="<%=jokes.author %>">
             <button class="full-width" type="submit">
               <%= submit %>
             </button>
